@@ -1,9 +1,13 @@
 {
+    "homepage": "https://princevenkat.github.io/moving",
     "private": true,
     "type": "module",
     "scripts": {
         "build": "tsc && vite build && vite build --ssr",
-        "dev": "vite"
+        "dev": "vite",
+
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
@@ -17,6 +21,7 @@
         "autoprefixer": "^10.4.12",
         "concurrently": "^9.0.1",
         "daisyui": "^4.12.23",
+        "gh-pages": "^6.3.0",
         "laravel-vite-plugin": "^1.2.0",
         "postcss": "^8.4.31",
         "react": "^18.2.0",
