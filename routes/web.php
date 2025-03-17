@@ -82,6 +82,9 @@ Route::post('/inquiry/{inquiry}/step2', [InquiryController::class, 'step2Store']
 Route::get('/inquiry/{inquiry}/step3', [InquiryController::class, 'step3'])->name('inquiry.step3');
 Route::post('/inquiry/{inquiry}/step3', [InquiryController::class, 'step3Store'])->name('inquiry.step3.store');
 
+Route::get('/inquiry/{inquiry}/step4', [InquiryController::class, 'step4'])->name('inquiry.step4');
+Route::post('/inquiry/{inquiry}/step4', [InquiryController::class, 'step4Store'])->name('inquiry.step4.store');
+
 
 
 

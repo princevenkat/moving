@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('inventory_id')->index()->constrained();
             $table->foreignId('parent_id')->nullable()->index()->constrained('inventory_items');
+
+            $table->json('options')->nullable(); // Store option names (e.g., type, size, weight)
+            $table->json('option_values')->nullable(); // Store selectable values per option
+
             $table->boolean('active')->default(true);
             $table->timestamps();
             $table->string('image')->nullable();

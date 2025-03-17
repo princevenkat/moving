@@ -100,6 +100,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inventory;
+use App\Models\InventoryItems;
 use Inertia\Inertia;
 use App\Models\Inquiry;
 use Illuminate\Http\Request;
@@ -185,7 +187,41 @@ class InquiryController extends Controller
 
         $inquiry->update($validated);
 
-        return redirect()->route('inquiry.step3', ['inquiry' => $inquiry->id]);
+        return redirect()->route('inquiry.step4', ['inquiry' => $inquiry->id]);
+    }
+
+
+    public function step4(Inquiry $inquiry)
+    {
+        return Inertia::render('Inquiry/Step4', [
+            'inquiry' => $inquiry,
+            'categories' => Inventory::all(),
+            'inventoryItems' => InventoryItems::all()
+        ]);
+    }
+
+
+    public function step4Store(Request $request, Inquiry $inquiry)
+    {
+        $validated = $request->validate([
+            'inventory' => 'array',
+            'inventory.*.room' => 'required|string',
+            'inventory.*.item' => 'required|string',
+            'inventory.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        // Remove existing inventory and insert new one
+        $inquiry->inventoryItems()->delete();
+        foreach ($validated['inventory'] as $item) {
+            InventoryItems::create([
+                'inquiry_id' => $inquiry->id,
+                'room' => $item['room'],
+                'item' => $item['item'],
+                'quantity' => $item['quantity']
+            ]);
+        }
+
+        return redirect()->route('inquiry.step5', ['inquiry' => $inquiry->id]);
     }
 
 
