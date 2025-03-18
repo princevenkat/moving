@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use App\Enums\RolesEnum;
+use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\ProductResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -58,6 +60,11 @@ class AdminPanelProvider extends PanelProvider
                     RolesEnum::Vendor->value,
                 ),
             ])
+            ->resources([
+                CategoryResource::class,
+                ProductResource::class,
+            ]);
+
 //            ->authMiddleware([
 //                Authenticate::class,
 //            ])

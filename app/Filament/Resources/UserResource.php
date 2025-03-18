@@ -21,8 +21,6 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-
-
     protected static ?string $navigationGroup = 'Users Management'; // Group in the sidebar
 
 

@@ -61,7 +61,6 @@ class InventoryItemsRelationManager extends RelationManager
                                     CheckboxList::make('options')
                                         ->columnSpan('full')
                                         ->label('Product Options')
-
                                         ->options([
                                             'type' => 'Type',
                                             'size' => 'Size',

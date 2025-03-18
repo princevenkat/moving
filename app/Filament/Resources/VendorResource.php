@@ -32,6 +32,7 @@ class VendorResource extends Resource
     protected static ?string $navigationLabel = 'Vendors'; // Label in the sidebar
     protected static ?string $navigationIcon = 'heroicon-o-user-group'; // Icon in the sidebar
 
+    protected static ?string $navigationGroup = 'Users Management'; // Group in the sidebar
     protected static ?int $navigationSort = 2; // Controls the position of the resource in the sidebar
 
     // In the VendorResource or any other place
