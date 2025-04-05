@@ -102,6 +102,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 use App\Models\InventoryItems;
+use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Inquiry;
 use Illuminate\Http\Request;
@@ -125,6 +126,22 @@ class InquiryController extends Controller
             'destination_city' => 'nullable',
             'email' => 'required|email',
         ]);
+
+        $user = auth()->user();
+
+        if (!$user) {
+            // Check if a guest user already exists
+            $user = User::where('email', $request->email)->first();
+
+            if (!$user) {
+                // Create a guest user
+                $user = User::create([
+                    'name' => 'Guest User', // You can modify this
+                    'email' => $request->email,
+                    'password' => bcrypt(uniqid()), // Generate a random password
+                ]);
+            }
+        }
 
         $inquiry = Inquiry::create($validated);
 

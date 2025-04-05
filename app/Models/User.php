@@ -59,5 +59,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
 
+    public function isVendor(): bool
+    {
+        return $this->vendor()->exists(); // Checks if the user has a linked vendor record
+    }
 
 }
