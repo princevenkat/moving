@@ -45,7 +45,8 @@ class ProductResource extends Resource
                                     ->maxLength(255),
 
                                 Forms\Components\Select::make('parent_id')
-                                    ->options(fn () => Product::where('id', optional($inventory)->id)->pluck('name', 'id')->toArray()) // ✅ Fixed
+                                   //->options(fn () => Product::where('id', optional($inventory)->id)->pluck('name', 'id')->toArray()) // ✅ Fixed
+                                    ->options(fn () => Product::where('id', '!=', optional($inventory)->id)->pluck('name', 'id')->toArray())
                                     ->label('Parent Inventory')
                                     ->preload()
                                     ->hidden()
@@ -90,7 +91,10 @@ class ProductResource extends Resource
                                         $set('option_values', $values);
                                     }),
 
-
+                                Forms\Components\Placeholder::make('options_hint')
+                                    ->content('Tip: Select one or more product options to unlock the "Product Info" tab, where you can provide specific details for each option.')
+                                    ->columnSpan('full')
+                                    ->visible(fn (callable $get) => empty($get('options'))),
                     Forms\Components\FileUpload::make('image')
                                     ->columnSpan('full')
                                     ->label('Upload Image')
@@ -118,7 +122,7 @@ class ProductResource extends Resource
 //                                                'rear-walls' => ["nailed rear wall", "non-nailed rear wall"],
 //                                                'doors' => ["Normal doors", "Sliding doors"],
 //                                            ];
-                                            $predefinedOptions = [
+                                            $predefinedOptionss = [
                                                 'size' => [
                                                     'couch' => ["Length up to 2m", "Length up to 4m", "Length more than 4m"],
                                                     'table' => ["2-4 persons", "6-8 persons", "9+ people"],
@@ -163,6 +167,20 @@ class ProductResource extends Resource
                                                     'flower-pot' => ["Empty", "Full"],
                                                 ],
                                             ];
+
+                                            $predefinedOptions = collect($predefinedOptionss)->map(function ($values) {
+                                                if (is_array($values)) {
+                                                    return collect($values)->map(function ($subValues) {
+                                                        if (is_array($subValues)) {
+                                                            return collect($subValues)->mapWithKeys(fn($v) => [$v => $v])->toArray();
+                                                        }
+                                                        return $subValues;
+                                                    })->toArray();
+                                                }
+                                                return $values;
+                                            })->toArray();
+
+
 
                                             return array_map(fn($option) =>
                                             Repeater::make("option_{$option}")

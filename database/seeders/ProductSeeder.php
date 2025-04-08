@@ -89,15 +89,33 @@ class ProductSeeder extends Seeder
 
         ];
 
-        foreach ($categoriesWithProducts as $categoryName => $products) {
+//        foreach ($categoriesWithProducts as $categoryName => $products) {
+//            $category = Category::firstOrCreate(['name' => $categoryName]);
+//
+//            foreach ($products as $productName) {
+//                $product = Product::firstOrCreate(['name' => $productName]);
+//
+//                // Attach product to category (avoid duplicates)
+//                $product->categories()->syncWithoutDetaching([$category->id]);
+//            }
+//        }
+
+        foreach ($categoriesWithProducts as $categoryName => $productNames) {
+            // Create or find the category
             $category = Category::firstOrCreate(['name' => $categoryName]);
 
-            foreach ($products as $productName) {
+            foreach ($productNames as $productName) {
+                // Create or find the product
                 $product = Product::firstOrCreate(['name' => $productName]);
 
-                // Attach product to category (avoid duplicates)
-                $product->categories()->syncWithoutDetaching([$category->id]);
+                // Attach the product to the category if not already attached
+                if (!$category->products()->where('product_id', $product->id)->exists()) {
+                    $category->products()->attach($product->id);
+                }
             }
         }
+
+
+
     }
 }

@@ -208,14 +208,70 @@ class InquiryController extends Controller
     }
 
 
+//    public function step4(Inquiry $inquiry)
+//    {
+//        return Inertia::render('Inquiry/Step4', [
+//            'inquiry' => $inquiry,
+//            'categories' => Inventory::all(),
+//            'inventoryItems' => InventoryItems::all()
+//        ]);
+//    }
+
     public function step4(Inquiry $inquiry)
     {
+        $categories = \App\Models\Category::with('products')->get();
+
+        $inventoryItems = []; // ✅ Always initialize arrays
+
+
+        foreach ($categories as $category) {
+
+
+
+            foreach ($category->products as $product) {
+
+                //$options = is_array($product->options) ? $product->options : json_decode($product->options, true);
+
+                $options = $product->getAttributes()['options'] ?? [];
+                if (is_string($options)) {
+                    $options = json_decode($options, true);
+                }
+
+                $optionValues = is_array($product->option_values) ? $product->option_values : json_decode($product->option_values, true);
+
+
+
+
+                $inventoryItems[] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'inventory_id' => $category->id,
+                    'options' => $product->getAttribute('options') ?? [],           // ✅ fallback to empty array
+                    'option_values' => $optionValues ?? [], // ✅ fallback to empty array
+                    'image' => $product->image,
+                ];
+               // dd($inventoryItems);
+            }
+        }
+
         return Inertia::render('Inquiry/Step4', [
             'inquiry' => $inquiry,
-            'categories' => Inventory::all(),
-            'inventoryItems' => InventoryItems::all()
+            'categories' => $categories->map(fn($cat) => [
+                'id' => $cat->id,
+                'name' => $cat->name,
+            ]),
+            'inventoryItems' => $inventoryItems,
         ]);
     }
+
+
+
+
+
+
+
+
+
 
 
     public function step4Store(Request $request, Inquiry $inquiry)
