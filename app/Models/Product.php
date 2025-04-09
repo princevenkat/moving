@@ -31,5 +31,11 @@ class Product extends Model
     }
 
 
+    public function optionValues()
+    {
+        return $this->belongsToMany(\App\Models\OptionValue::class, 'product_option_value');
+    }
+
+
 }
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { router, useForm } from "@inertiajs/react";
+import {router, useForm, usePage} from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { NumberInput } from "@/Components/Core/NumberInput";
 
@@ -9,6 +9,7 @@ import { NumberInput } from "@/Components/Core/NumberInput";
 //   name: string;
 //   inventory_id: number;
 // }
+
 
 interface InventoryItems {
   id: number;
@@ -35,8 +36,28 @@ interface Step4Props {
   inventoryItems: InventoryItems[];
 }
 
+type InventoryItem = {
+  category: string;
+  item: string;
+  quantity: number;
+  size: string;
+  weight: string;
+  type: string;
+  doors: string;
+  "rear-walls": string;
+};
+
+type FormData = {
+  inventory: InventoryItem[];
+};
+
+
 export default function Step4({ inquiry, categories, inventoryItems }: Step4Props) {
-  const { data, setData, post, processing } = useForm({
+
+
+
+
+  const { data, setData, post, processing } = useForm<FormData>({
     inventory: [] as {
       category: string;
       item: string;
@@ -44,8 +65,8 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
       size: string;
       weight: string;
       type: string;
-      doors?: string;
-      "rear-walls"?: string;
+      doors: string;
+      "rear-walls": string;
     }[],
   });
 
@@ -115,47 +136,21 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
     return acc;
   }, {} as Record<string, typeof data.inventory>);
 
-  // const options = {
-  //   type: ["Dismantlable", "Non dismantlable"],
-  //   size: ["Up to 1.2m long", "Up to 1.8m long", "Up to 2.4m long"],
-  //   weight: ["Up to 60kg", "60kg to 100kg", "100kg to 150kg", "More than 150kg"],
-  //   "rear-walls": ["nailed rear wall", "non-nailed rear wall"],
-  //   doors: ["Normal doors", "Sliding doors"],
-  // };
-
-  // const productOptions = {
-  //   Couch: ["size"],
-  //   Table: ["size", "weight"],
-  //   Chair: ["weight"],
-  //   Wardrobe: ["weight", "type", "doors", "rear-walls"],
-  // };
-
-
-
-
-
-
 
   const selectedItem = inventoryItems.find(item => item.name === selectedProduct);
-  //
-  // const productOptions = selectedItem?.options ?? [];
-  // // const optionValues = selectedItem?.option_values ?? {};
-  // // Normalizing the array into object shape
-  // const optionValues = selectedItem?.option_values?.reduce((acc, curr) => {
-  //   const [key, value] = Object.entries(curr)[0];
-  //   acc[key.replace("option_", "")] = value;
-  //   return acc;
-  // }, {} as Record<string, OptionValue[]>) ?? {};
-
 
   const optionValuesArray = selectedItem?.option_values ?? [];
-
   const optionValues = optionValuesArray.reduce((acc, curr) => {
     Object.entries(curr).forEach(([key, value]) => {
       acc[key] = value;
     });
     return acc;
   }, {});
+
+
+
+
+
 
   const productOptions = Object.keys(optionValues);
 
@@ -219,7 +214,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                         {inv.item} (x{inv.quantity})
                         {Object.entries(inv).map(([key, value]) => {
                           if (["item", "quantity"].includes(key)) return null; // skip these
-                          const label = getCustomLabel(key, value, optionValues);
+                          const label = getCustomLabel(key, String(value), optionValues);
                           return label ? ` – ${key.replace("option_", "").replace("-", " ")}: ${label}` : null;
                         })}
                         <button type="button" className="btn btn-error btn-sm ml-2" onClick={() => removeItem(index)}>
@@ -243,8 +238,12 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
           {/* CATEGORY MODAL */}
           {showPopup === "category" && (
             <dialog className="modal modal-open">
+
               <div className="modal-box max-w-2xl">
-                <h2 className="text-xl font-bold">Select Inventory Category</h2>
+
+                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setShowPopup(null)}>X</button>
+
+                <h2 className="text-xl font-bold">Select Room</h2>
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   {categories.map((category) => (
                     <button key={category.id} className="btn" onClick={() => selectCategory(category.id)}>
@@ -252,9 +251,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                     </button>
                   ))}
                 </div>
-                <button className="btn btn-outline mt-4" onClick={() => setShowPopup(null)}>
-                  Close
-                </button>
+                {/*<button className="btn btn-outline mt-4" onClick={() => setShowPopup(null)}>Close</button>*/}
               </div>
             </dialog>
           )}
@@ -263,19 +260,25 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
           {showPopup === "product" && selectedCategory !== null && (
             <dialog className="modal modal-open">
               <div className="modal-box max-w-2xl">
+                <div className={"absolute right-2 top-2"}>
+                  <button className="btn btn-sm text-xs uppercase btn-ghost mt-4" onClick={() => setShowPopup("category")}>
+                    Back
+                  </button>
+                  <button className="btn btn-sm btn-circle btn-ghost "
+                          onClick={() => setShowPopup(null)}>X
+                  </button>
+                </div>
                 <h2 className="text-xl font-bold">Select Product</h2>
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   {inventoryItems
                     .filter((item) => item.inventory_id === selectedCategory)
                     .map((item) => (
-                      <button key={item.id} className="btn" onClick={() => selectProduct(item.name)}>
+                      <button key={item.id} className="btn btn-sm text-xs font-semibold" onClick={() => selectProduct(item.name)}>
                         {item.name}
                       </button>
                     ))}
                 </div>
-                <button className="btn btn-outline mt-4" onClick={() => setShowPopup("category")}>
-                  Back
-                </button>
+
               </div>
             </dialog>
           )}
@@ -284,17 +287,30 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
           {showPopup === "details" && selectedProduct && selectedItem && (
             <dialog className="modal modal-open">
               <div className="modal-box max-w-2xl">
-                <h2 className="text-xl font-bold">Enter Product Details</h2>
 
-                <NumberInput
-                  type="number"
-                  className="input input-bordered mt-2 w-32"
-                  placeholder="Quantity"
-                  min="1"
-                  value={newItem.quantity}
-                  onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
-                />
+                <div className={"absolute right-2 top-2"}>
+                  <button className="btn btn-sm text-xs uppercase btn-ghost mt-4"
+                          onClick={() => setShowPopup("product")}>
+                    Back
+                  </button>
+                  <button className="btn btn-sm btn-circle btn-ghost "
+                          onClick={() => setShowPopup(null)}>X
+                  </button>
+                </div>
 
+
+                <h2 className="text-sm font-semibold capitalize mb-1">Quantiry</h2>
+
+                <div className="w-32">
+                  <NumberInput
+                    type="number"
+                    className="input input-bordered mt-2 w-32"
+                    placeholder="Quantity"
+                    min="1"
+                    value={newItem.quantity}
+                    onChange={(e) => setNewItem({...newItem, quantity: Number(e.target.value)})}
+                  />
+                </div>
                 <div className="grid grid-cols-2 gap-4 mt-4">
 
                   {productOptions.map((optionKey) => {
@@ -303,16 +319,17 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
 
                     return (
                       <fieldset key={optionKey}>
-                        <legend className="text-sm font-semibold capitalize">{optionKey.replace("option_", "").replace("-", " ")}
+                        <legend
+                          className="text-sm font-semibold capitalize">{optionKey.replace("option_", "").replace("-", " ")}
                         </legend>
                         {values.map((val, idx) => (
-                          <label key={idx} className="flex items-center gap-2 mt-1">
+                          <label key={idx} className="flex items-center gap-2 mt-1 mb-2 cursor-pointer">
                             <input
                               type="radio"
                               className="radio radio-sm"
                               name={optionKey}
                               value={val.value}
-                              onChange={(e) => setNewItem({ ...newItem, [optionKey]: e.target.value })}
+                              onChange={(e) => setNewItem({...newItem, [optionKey]: e.target.value})}
                             />
                             <span className="text-sm">{val.value}</span>
                             {val.custom_value && (
@@ -326,9 +343,6 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                 </div>
 
                 <div className="mt-6 flex justify-between">
-                  <button className="btn btn-outline" onClick={() => setShowPopup("product")}>
-                    Back
-                  </button>
                   <button className="btn btn-neutral" onClick={addItem}>
                     Add Item
                   </button>

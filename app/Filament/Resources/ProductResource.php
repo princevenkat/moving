@@ -68,7 +68,6 @@ class ProductResource extends Resource
                                         'size' => 'Size',
                                         'weight' => 'Weight',
                                         'doors' => 'Doors',
-                                        'rear-walls' => 'Rear Walls',
                                         'material' => 'Material',
                                         'rear-wall' => 'Rear Wall',
                                         'content' => 'Content',
@@ -78,19 +77,35 @@ class ProductResource extends Resource
                                     ->reactive()
                                     ->columns(6)
                                     //->afterStateUpdated(fn (callable $set, $state) => $set('options', (array) $state)), // ✅ Ensure it's stored as an array
+//                                    ->afterStateUpdated(function (callable $set, callable $get) {
+//                                        $values = $get('option_values') ?? [];
+//
+//                                        foreach ($values as &$value) {
+//                                            if (!empty($value['custom_value'])) {
+//                                                $value['value'] = $value['custom_value']; // Use custom_value if not empty
+//                                            }
+//                                            unset($value['custom_value']); // Remove it to avoid duplicate storage
+//                                        }
+//
+//                                        $set('option_values', $values);
+//                                    }),
+
                                     ->afterStateUpdated(function (callable $set, callable $get) {
-                                        $values = $get('option_values') ?? [];
+                                        $values = $get('option_values');
+
+                                        if (!is_array($values)) {
+                                            $values = [];
+                                        }
 
                                         foreach ($values as &$value) {
                                             if (!empty($value['custom_value'])) {
-                                                $value['value'] = $value['custom_value']; // Use custom_value if not empty
+                                                $value['value'] = $value['custom_value'];
                                             }
-                                            unset($value['custom_value']); // Remove it to avoid duplicate storage
+                                            unset($value['custom_value']);
                                         }
 
                                         $set('option_values', $values);
                                     }),
-
                                 Forms\Components\Placeholder::make('options_hint')
                                     ->content('Tip: Select one or more product options to unlock the "Product Info" tab, where you can provide specific details for each option.')
                                     ->columnSpan('full')
@@ -156,16 +171,35 @@ class ProductResource extends Resource
                                                     'mirror' => ["Length up to 1m", "Length up to 2m", "Length more than 2m"],
                                                     'grill' => ["Length up to 1m", "Length up to 2m", "Length more than 2m"],
                                                 ],
+                                                'type' =>[
+                                                    'shelf' => ['Dismantlable', 'Non dismantlable'],
+                                                    'bed' => [
+                                                        'Single bed', 'Double bed', 'Couch bed', 'Loft bed', 'Boxspring bed', 'Waterbed', 'Folding bed', 'Canopy bed', 'Bunk bed',
+                                                    ],
+                                                ],
                                                 'material' => [
                                                     'table' => ["Wood", "Stone / Metal", "Glass"],
                                                     'garden-table' => ["Wood", "Stone / Metal", "Glass"],
                                                 ],
-                                                'rear-wall' => ["nailed rear wall", "non-nailed rear wall"],
-                                                'doors' => ["Normal doors", "Sliding doors"],
+                                                'rear-wall' => [
+                                                    'wardrobe' => ["nailed rear wall", "non-nailed rear wall"],
+                                                ],
+                                                'nailed' => [
+                                                    'wardrobe-sliding' => ["nailed rear wall", "non-nailed rear wall"],
+                                                ],
+
+                                                'doors' => [
+                                                    'wardrobe' => [ "Normal doors", "Sliding doors"],
+                                                ],
                                                 'gas-grill' => ["No", "Yes"],
                                                 'content' => [
                                                     'flower-pot' => ["Empty", "Full"],
                                                 ],
+                                                'weight' =>[
+                                                    'plant' => ["Up to 60kg", "60kg to 100kg", "100kg to 150kg", "More than 150kg"],
+                                                    'safe'=>["Up to 100kg","Up to 200kg","More than 200kg"],
+                                                    'weight-bench-weights'=> ['Up to 100kg', 'Up to 200kg', 'Plus de 200kg'],
+                                                ]
                                             ];
 
                                             $predefinedOptions = collect($predefinedOptionss)->map(function ($values) {
