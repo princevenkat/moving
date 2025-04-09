@@ -1,28 +1,23 @@
+// noinspection TypeScriptValidateTypes
+
 import { useState } from "react";
-import {router, useForm, usePage} from "@inertiajs/react";
+import { router, useForm } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { NumberInput } from "@/Components/Core/NumberInput";
 
-// Define types
-// interface InventoryItems {
-//   id: number;
-//   name: string;
-//   inventory_id: number;
-// }
-
+// Types
+interface OptionValue {
+  value: string;
+  custom_value: string | null;
+}
 
 interface InventoryItems {
   id: number;
   name: string;
   inventory_id: number;
-  options: string[]; // e.g., ['size', 'weight']
-  option_values: Record<string, OptionValue[]>; // FIXED type
+  options: string[];
+  option_values: Record<string, OptionValue[]>;
   image?: string;
-}
-
-interface OptionValue {
-  value: string;
-  custom_value: string | null;
 }
 
 interface Inventory {
@@ -40,40 +35,23 @@ type InventoryItem = {
   category: string;
   item: string;
   quantity: number;
-  size: string;
-  weight: string;
-  type: string;
-  doors: string;
-  "rear-walls": string;
+} & {
+  [key: string]: string | number; // This allows dynamic option keys like "option_size", "option_weight", etc.
 };
 
 type FormData = {
   inventory: InventoryItem[];
 };
 
-
 export default function Step4({ inquiry, categories, inventoryItems }: Step4Props) {
-
-
-
-
   const { data, setData, post, processing } = useForm<FormData>({
-    inventory: [] as {
-      category: string;
-      item: string;
-      quantity: number;
-      size: string;
-      weight: string;
-      type: string;
-      doors: string;
-      "rear-walls": string;
-    }[],
+    inventory: [],
   });
 
   const [showPopup, setShowPopup] = useState<'category' | 'product' | 'details' | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
-  const [newItem, setNewItem] = useState({
+  const [newItem, setNewItem] = useState<InventoryItem>({
     category: "",
     item: "",
     quantity: 1,
@@ -84,9 +62,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
     "rear-walls": "",
   });
 
-  function openCategoryPopup() {
-    setShowPopup("category");
-  }
+  const openCategoryPopup = () => setShowPopup("category");
 
   function selectCategory(categoryId: number) {
     setSelectedCategory(categoryId);
@@ -102,7 +78,12 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
 
   function addItem() {
     if (selectedProduct && newItem.quantity > 0) {
-      setData("inventory", [...data.inventory, { ...newItem, item: selectedProduct }]);
+      const itemToAdd: InventoryItem = {
+        ...newItem,
+        item: selectedProduct,
+      };
+
+      setData("inventory", [...data.inventory, itemToAdd]);
       setNewItem({
         category: "",
         item: "",
@@ -119,6 +100,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
     }
   }
 
+
   function removeItem(index: number) {
     setData("inventory", data.inventory.filter((_, i) => i !== index));
   }
@@ -128,43 +110,18 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
     post(route("inquiry.step4.store", { inquiry: inquiry.id }));
   }
 
-  const groupedInventory = data.inventory.reduce((acc, item) => {
-    if (!acc[item.category]) {
-      acc[item.category] = [];
-    }
+  const groupedInventory = data.inventory.reduce((acc: Record<string, InventoryItem[]>, item) => {
+    if (!acc[item.category]) acc[item.category] = [];
     acc[item.category].push(item);
-    return acc;
-  }, {} as Record<string, typeof data.inventory>);
-
-
-  const selectedItem = inventoryItems.find(item => item.name === selectedProduct);
-
-  const optionValuesArray = selectedItem?.option_values ?? [];
-  const optionValues = optionValuesArray.reduce((acc, curr) => {
-    Object.entries(curr).forEach(([key, value]) => {
-      acc[key] = value;
-    });
     return acc;
   }, {});
 
-
-
-
-
-
+  const selectedItem = inventoryItems.find(item => item.name === selectedProduct);
+  const optionValues: Record<string, OptionValue[]> = selectedItem?.option_values ?? {};
   const productOptions = Object.keys(optionValues);
 
-
-  //console.log(selectedItem);
-
-
-
-  function getCustomLabel(
-    key: string,
-    value: string | undefined,
-    optionValues: Record<string, OptionValue[]>
-  ): string {
-    const match = optionValues?.[key]?.find(opt => opt.value === value);
+  function getCustomLabel(key: string, value: string | undefined, options: Record<string, OptionValue[]>) {
+    const match = options?.[key]?.find(opt => opt.value === value);
     return match?.custom_value || value!;
   }
 
@@ -185,26 +142,6 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
             </button>
 
             <ul className="mt-4 space-y-4">
-              {/*{Object.entries(groupedInventory).map(([category, items]) => (*/}
-              {/*  <li key={category}>*/}
-              {/*    <h3 className="font-bold">{category}</h3>*/}
-              {/*    <ul className="ml-4 list-disc">*/}
-              {/*      {items.map((inv, index) => (*/}
-              {/*        <li key={index}>*/}
-              {/*          {inv.item} (x{inv.quantity}) –*/}
-              {/*          {inv.size && `Size: ${getCustomLabel("size", inv.size, optionValues)}, `}*/}
-              {/*          {inv.weight && `Weight: ${getCustomLabel("weight", inv.weight, optionValues)}, `}*/}
-              {/*          {inv.type && `Type: ${getCustomLabel("type", inv.type, optionValues)}, `}*/}
-              {/*          {inv.doors && `Doors: ${getCustomLabel("doors", inv.doors, optionValues)}, `}*/}
-              {/*          {inv["rear-walls"] && `Rear Walls: ${getCustomLabel("rear-walls", inv["rear-walls"], optionValues)}`}*/}
-              {/*          <button type="button" className="btn btn-error btn-sm ml-2" onClick={() => removeItem(index)}>*/}
-              {/*            Remove*/}
-              {/*          </button>*/}
-              {/*        </li>*/}
-              {/*      ))}*/}
-              {/*    </ul>*/}
-              {/*  </li>*/}
-              {/*))}*/}
               {Object.entries(groupedInventory).map(([category, items]) => (
                 <li key={category}>
                   <h3 className="font-bold">{category}</h3>
@@ -213,7 +150,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                       <li key={index}>
                         {inv.item} (x{inv.quantity})
                         {Object.entries(inv).map(([key, value]) => {
-                          if (["item", "quantity"].includes(key)) return null; // skip these
+                          if (["item", "quantity", "category"].includes(key)) return null;
                           const label = getCustomLabel(key, String(value), optionValues);
                           return label ? ` – ${key.replace("option_", "").replace("-", " ")}: ${label}` : null;
                         })}
@@ -225,7 +162,6 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                   </ul>
                 </li>
               ))}
-
             </ul>
 
             <div className="flex justify-end mt-6">
@@ -238,11 +174,8 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
           {/* CATEGORY MODAL */}
           {showPopup === "category" && (
             <dialog className="modal modal-open">
-
               <div className="modal-box max-w-2xl">
-
                 <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => setShowPopup(null)}>X</button>
-
                 <h2 className="text-xl font-bold">Select Room</h2>
                 <div className="grid grid-cols-3 gap-2 mt-4">
                   {categories.map((category) => (
@@ -251,7 +184,6 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                     </button>
                   ))}
                 </div>
-                {/*<button className="btn btn-outline mt-4" onClick={() => setShowPopup(null)}>Close</button>*/}
               </div>
             </dialog>
           )}
@@ -260,13 +192,11 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
           {showPopup === "product" && selectedCategory !== null && (
             <dialog className="modal modal-open">
               <div className="modal-box max-w-2xl">
-                <div className={"absolute right-2 top-2"}>
-                  <button className="btn btn-sm text-xs uppercase btn-ghost mt-4" onClick={() => setShowPopup("category")}>
+                <div className="absolute right-2 top-2 flex gap-2">
+                  <button className="btn btn-sm text-xs uppercase btn-ghost" onClick={() => setShowPopup("category")}>
                     Back
                   </button>
-                  <button className="btn btn-sm btn-circle btn-ghost "
-                          onClick={() => setShowPopup(null)}>X
-                  </button>
+                  <button className="btn btn-sm btn-circle btn-ghost" onClick={() => setShowPopup(null)}>X</button>
                 </div>
                 <h2 className="text-xl font-bold">Select Product</h2>
                 <div className="grid grid-cols-3 gap-2 mt-4">
@@ -278,29 +208,24 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                       </button>
                     ))}
                 </div>
-
               </div>
             </dialog>
           )}
 
           {/* DETAILS MODAL */}
           {showPopup === "details" && selectedProduct && selectedItem && (
+            console.log("Option values inside modal:", optionValues),
             <dialog className="modal modal-open">
-              <div className="modal-box max-w-2xl">
 
-                <div className={"absolute right-2 top-2"}>
-                  <button className="btn btn-sm text-xs uppercase btn-ghost mt-4"
-                          onClick={() => setShowPopup("product")}>
+              <div className="modal-box max-w-2xl">
+                <div className="absolute right-2 top-2 flex gap-2">
+                  <button className="btn btn-sm text-xs uppercase btn-ghost" onClick={() => setShowPopup("product")}>
                     Back
                   </button>
-                  <button className="btn btn-sm btn-circle btn-ghost "
-                          onClick={() => setShowPopup(null)}>X
-                  </button>
+                  <button className="btn btn-sm btn-circle btn-ghost" onClick={() => setShowPopup(null)}>X</button>
                 </div>
 
-
-                <h2 className="text-sm font-semibold capitalize mb-1">Quantiry</h2>
-
+                <h2 className="text-sm font-semibold capitalize mb-1">Quantity</h2>
                 <div className="w-32">
                   <NumberInput
                     type="number"
@@ -308,19 +233,19 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                     placeholder="Quantity"
                     min="1"
                     value={newItem.quantity}
-                    onChange={(e) => setNewItem({...newItem, quantity: Number(e.target.value)})}
+                    onChange={(e) => setNewItem({ ...newItem, quantity: Number(e.target.value) })}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
 
+                <div className="grid grid-cols-2 gap-4 mt-4">
                   {productOptions.map((optionKey) => {
                     const values = optionValues[optionKey];
                     if (!Array.isArray(values)) return null;
 
                     return (
                       <fieldset key={optionKey}>
-                        <legend
-                          className="text-sm font-semibold capitalize">{optionKey.replace("option_", "").replace("-", " ")}
+                        <legend className="text-sm font-semibold capitalize">
+                          {optionKey.replace("option_", "").replace("-", " ")}
                         </legend>
                         {values.map((val, idx) => (
                           <label key={idx} className="flex items-center gap-2 mt-1 mb-2 cursor-pointer">
@@ -329,7 +254,7 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
                               className="radio radio-sm"
                               name={optionKey}
                               value={val.value}
-                              onChange={(e) => setNewItem({...newItem, [optionKey]: e.target.value})}
+                              onChange={(e) => setNewItem({ ...newItem, [optionKey]: e.target.value })}
                             />
                             <span className="text-sm">{val.value}</span>
                             {val.custom_value && (
@@ -350,7 +275,6 @@ export default function Step4({ inquiry, categories, inventoryItems }: Step4Prop
               </div>
             </dialog>
           )}
-
         </div>
       </div>
     </AuthenticatedLayout>

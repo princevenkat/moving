@@ -220,37 +220,42 @@ class InquiryController extends Controller
     public function step4(Inquiry $inquiry)
     {
         $categories = \App\Models\Category::with('products')->get();
-
-        $inventoryItems = []; // ✅ Always initialize arrays
-
+        $inventoryItems = [];
 
         foreach ($categories as $category) {
-
-
-
             foreach ($category->products as $product) {
-
-                //$options = is_array($product->options) ? $product->options : json_decode($product->options, true);
-
-                $options = $product->getAttributes()['options'] ?? [];
+                // Decode options (if needed)
+                $options = $product->getAttribute('options') ?? [];
                 if (is_string($options)) {
                     $options = json_decode($options, true);
                 }
 
-                $optionValues = is_array($product->option_values) ? $product->option_values : json_decode($product->option_values, true);
+                // Decode option_values and flatten to correct format
+                $rawOptionValues = $product->getAttribute('option_values') ?? [];
+                if (is_string($rawOptionValues)) {
+                    $rawOptionValues = json_decode($rawOptionValues, true);
+                }
 
-
-
+                // Handle format: [{ "option_name": [...] }]
+                $flattenedOptionValues = [];
+                if (is_array($rawOptionValues)) {
+                    foreach ($rawOptionValues as $item) {
+                        if (is_array($item)) {
+                            foreach ($item as $key => $value) {
+                                $flattenedOptionValues[$key] = $value;
+                            }
+                        }
+                    }
+                }
 
                 $inventoryItems[] = [
                     'id' => $product->id,
                     'name' => $product->name,
                     'inventory_id' => $category->id,
-                    'options' => $product->getAttribute('options') ?? [],           // ✅ fallback to empty array
-                    'option_values' => $optionValues ?? [], // ✅ fallback to empty array
+                    'options' => $options,
+                    'option_values' => $flattenedOptionValues,
                     'image' => $product->image,
                 ];
-               // dd($inventoryItems);
             }
         }
 
@@ -263,6 +268,7 @@ class InquiryController extends Controller
             'inventoryItems' => $inventoryItems,
         ]);
     }
+
 
 
 
