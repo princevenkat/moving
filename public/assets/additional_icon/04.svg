@@ -1,0 +1,27 @@
+<svg width="48" height="49" viewBox="0 0 48 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Moving Box">
+<g id="Shape">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M40.2699 19.1855V41.6406L16.9668 44.2715V21.8164" fill="#F5F5F5"/>
+<path d="M40.2699 19.1855V41.6406L16.9668 44.2715V21.8164" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<path id="Shape_2" d="M16.9668 21.8164L40.2699 19.1855" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Shape_3" d="M14.0195 12.8874L27.8241 11.2637" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="Shape_4">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16.9681 21.816V44.2711L6.05273 36.3797V13.9258" fill="#CCCCCC"/>
+<path d="M16.9681 21.816V44.2711L6.05273 36.3797V13.9258" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g id="Shape_5">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M40.2696 19.1555L46.4254 9.19214L32.9761 3.3623L27.8242 11.2641" fill="white"/>
+<path d="M40.2696 19.1555L46.4254 9.19214L32.9761 3.3623L27.8242 11.2641" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<path id="Shape_6" d="M27.8242 11.2637L40.2696 19.1551" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Shape_7" d="M27.8242 11.2637V20.5944" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="Shape_8">
+<path fill-rule="evenodd" clip-rule="evenodd" d="M16.9673 21.8167L13.0027 10.5062L1.5 5.01172L6.05192 13.9264" fill="#CCCCCC"/>
+<path d="M16.9673 21.8167L13.0027 10.5062L1.5 5.01172L6.05192 13.9264" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<path id="Shape_9" fill-rule="evenodd" clip-rule="evenodd" d="M33.68 36.9143L23.7881 37.9514C23.5993 37.9521 23.418 37.8775 23.2844 37.7443C23.1508 37.6111 23.0759 37.4301 23.0762 37.2416V27.3646C23.0774 26.975 23.3934 26.6595 23.7835 26.6582L33.6754 25.6211C34.0655 25.6224 34.3814 25.9379 34.3827 26.3275V36.2044C34.3834 36.5936 34.0697 36.9105 33.68 36.9143Z" fill="#F0F6FB" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Shape_10" d="M26.7734 31.7916L28.2111 33.3024L30.9273 30.1553" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+<path id="Shape_11" d="M6.05273 13.9258L16.9681 21.8161" stroke="#333333" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>

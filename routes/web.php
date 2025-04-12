@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -20,18 +21,31 @@ Route::middleware('auth:sanctum')->get('/vendor', function (Request $request) {
     return $request->vendor();
 });
 
+// VUE ROUTES
 Route::get('/', function () {
-    return Inertia::render('Home', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-})->name('dashboard');
+    return Inertia::render('Welcome');
+})->name('home');
 
-//Route::get('/dashboard', function () {
-//    return Inertia::render('Dashboard');
-//})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';
+
+// VUE ROUTES
+
+
+//Route::get('/', function () {
+//    return Inertia::render('Home', [
+//        'canLogin' => Route::has('login'),
+//        'canRegister' => Route::has('register'),
+//        'laravelVersion' => Application::VERSION,
+//        'phpVersion' => PHP_VERSION,
+//    ]);
+//})->name('dashboard');
+
+
 
 
 Route::post('stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
@@ -40,6 +54,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/inquiries', [UserDashboardController::class, 'index'])->name('inquiries');
 });
 
 
@@ -53,7 +69,7 @@ Route::middleware(['verified'])->group(function () {
     ->middleware(['role:' . \App\Enums\RolesEnum::Vendor->value]);
 });
 
-require __DIR__.'/auth.php';
+//require __DIR__.'/auth.php';
 
 
 
@@ -90,6 +106,11 @@ Route::post('/inquiry/{inquiry}/step3', [InquiryController::class, 'step3Store']
 Route::get('/inquiry/{inquiry}/step4', [InquiryController::class, 'step4'])->name('inquiry.step4');
 Route::post('/inquiry/{inquiry}/step4', [InquiryController::class, 'step4Store'])->name('inquiry.step4.store');
 
+Route::get('/inquiry/{inquiry}/step5', [InquiryController::class, 'step5'])->name('inquiry.step5');
+Route::post('/inquiry/{inquiry}/step5', [InquiryController::class, 'step5Store'])->name('inquiry.step5.store');
+
+Route::get('/inquiry/{inquiry}/thankYou', [InquiryController::class, 'thankYou'])->name('inquiry.thankYou');
+Route::post('/inquiry/{inquiry}/thankYou', [InquiryController::class, 'thankYouStore'])->name('inquiry.thankYou.store');
 
 
 

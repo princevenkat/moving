@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Enums\RolesEnum;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Faker\Generator as Faker;
+
 class UserSeeder extends Seeder
 {
     /**
@@ -13,8 +13,6 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = app(Faker::class);
-
         User::factory()->create([
             'name' => 'Venkat',
             'last_name' => '',

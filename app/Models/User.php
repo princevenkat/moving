@@ -11,7 +11,8 @@ use SimonHamp\LaravelStripeConnect\Traits\Payable;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+//class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, Payable;
@@ -24,9 +25,12 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var list<string>
      */
     protected $fillable = [
+        'gender',
         'name',
+        'last_name',
         'email',
         'password',
+        'phone_number',
     ];
 
     /**
@@ -62,6 +66,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isVendor(): bool
     {
         return $this->vendor()->exists(); // Checks if the user has a linked vendor record
+    }
+
+
+    public function inquiries()
+    {
+        return $this->hasMany(Inquiry::class);
     }
 
 }
