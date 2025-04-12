@@ -22,4 +22,5 @@ class Inquiry extends Model {
     }
 
 
+
 }

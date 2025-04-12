@@ -8,12 +8,13 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.tsx',
+        './resources/**/*.{vue,js,ts,jsx,tsx,blade.php}',
     ],
 
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Rubik', ...defaultTheme.fontFamily.sans],
+              ubuntu: ['Ubuntu', 'sans-serif'],
             },
         },
     },
